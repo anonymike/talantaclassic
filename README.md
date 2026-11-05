@@ -39,6 +39,8 @@ Then open Vercel, choose **Add New Project**, import the GitHub repository, and 
 
 The repository now owns the poster at `client/public/match-poster.png`, so the artwork works independently of Manus storage. Live Stripe payment processing, database order persistence, and transactional E-ticket email delivery still require a backend deployment and provider credentials; the current Vercel deployment intentionally keeps the demo payment flow.
 
+The public homepage also includes the supplied Talanta Stadium image at `client/public/stadium-background.png` without recompression. It is preloaded and rendered beneath a readability overlay. Visitors can switch between persistent dark and light modes using the header toggle; the preference is saved in their browser.
+
 ## Admin panel and Resend delivery
 
 Open `/admin` to use the MatchPass Control Room. The homepage editor can update the announcement, hero copy, event details, ticket tier labels, ticket prices, availability labels, delivery note, and support email. In this first deployment-ready version, edits persist in the current browser with `localStorage`; connect `SiteContent` to your database when multiple admins need shared publishing.

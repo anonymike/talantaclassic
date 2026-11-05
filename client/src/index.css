@@ -258,3 +258,31 @@ h2 { font-size: clamp(50px, 6vw, 82px); margin-top: 22px; }
   .form-row { grid-template-columns: 1fr; gap: 0; }
   .checkout-header h2 { font-size: 39px; }
 }
+
+/* Matchday background and accessible theme switch */
+.site-shell {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--ink);
+  background-image: linear-gradient(rgba(7, 11, 21, .88), rgba(7, 11, 21, .94)), url("/stadium-background.png");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+.site-shell::before { content: ""; position: fixed; z-index: -1; inset: 0; pointer-events: none; background: radial-gradient(circle at 18% 12%, rgba(11, 71, 170, .2), transparent 30rem); }
+.theme-toggle { color: var(--paper); background: rgba(13,16,24,.52); border: 1px solid rgba(243,240,233,.28); display: inline-flex; align-items: center; gap: 7px; padding: 10px 12px; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
+.site-light { --ink: #18202c; --ink-2: #f7f8fa; --ink-3: #edf1f5; --paper: #1b222d; --muted-paper: #5f6977; --line: rgba(24,32,44,.16); color: #18202c; background-image: linear-gradient(rgba(245,248,252,.84), rgba(245,248,252,.94)), url("/stadium-background.png"); }
+.site-light::before { background: radial-gradient(circle at 18% 12%, rgba(24, 87, 180, .18), transparent 30rem); }
+.site-light .topline, .site-light .desktop-nav { color: #526071; }
+.site-light .topline-note { color: #687587; }
+.site-light .header-cta, .site-light .theme-toggle { color: #18202c; background: rgba(255,255,255,.65); border-color: rgba(24,32,44,.2); }
+.site-light .hero-intro, .site-light .section-heading > p, .site-light .confidence-copy > p { color: #566272; }
+.site-light .hero-details strong { color: #263241; }
+.site-light .match-strip { background: rgba(238,242,247,.92); border-color: rgba(24,32,44,.14); }
+.site-light .strip-item { border-color: rgba(24,32,44,.13); }.site-light .strip-item span { color: #6d7887; }.site-light .strip-item strong { color: #263241; }
+.site-light .tier-card { background: rgba(255,255,255,.86); border-color: rgba(24,32,44,.14); }.site-light .tier-card:hover, .site-light .tier-card.selected { background: linear-gradient(90deg, rgba(225,38,47,.1), rgba(255,255,255,.94) 65%); }.site-light .tier-main > p, .site-light .tier-main li { color: #5d6876; }.site-light .tier-number { color: #8a95a2; }.site-light .tier-buy { border-color: rgba(24,32,44,.13); }.site-light .quantity-control { border-color: rgba(24,32,44,.22); }.site-light .quantity-control button { color: #18202c; }
+.site-light .confidence-section, .site-light .faq-section { border-color: rgba(24,32,44,.14); }.site-light .confidence-grid > div { border-color: rgba(24,32,44,.25); }.site-light .confidence-grid p, .site-light .faq-list p { color: #5f6b79; }.site-light .faq-list, .site-light .faq-list details { border-color: rgba(24,32,44,.14); }.site-light .faq-list summary { color: #263241; }
+.site-light .site-footer { background: rgba(238,242,247,.94); border-color: rgba(24,32,44,.14); }.site-light .footer-brand p, .site-light .footer-right { color: #697587; }
+@media (max-width: 760px) { .site-header { flex-wrap: wrap; height: auto; gap: 14px; padding-top: 20px; padding-bottom: 20px; }.desktop-nav { order: 3; width: 100%; margin-left: 0; justify-content: space-between; gap: 12px; }.theme-toggle { margin-left: auto; }.header-cta { padding: 10px 12px; } }

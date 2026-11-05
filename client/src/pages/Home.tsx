@@ -13,6 +13,8 @@ import {
   Minus,
   Plus,
   ShieldCheck,
+  Sun,
+  Moon,
   Ticket,
   Trophy,
   Users,
@@ -41,12 +43,20 @@ export default function Home() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", city: "" });
   const [orderRef, setOrderRef] = useState("");
   const [copied, setCopied] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    if (typeof window === "undefined") return "dark";
+    return window.localStorage.getItem("matchpass-theme") === "light" ? "light" : "dark";
+  });
 
   useEffect(() => {
     const syncContent = () => setContent(readSiteContent());
     window.addEventListener("matchpass-content-updated", syncContent);
     return () => window.removeEventListener("matchpass-content-updated", syncContent);
   }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("matchpass-theme", theme);
+  }, [theme]);
 
   const selectedItems = useMemo(
     () => tiers.filter((tier) => quantities[tier.id] > 0),
@@ -103,7 +113,7 @@ export default function Home() {
   };
 
   return (
-    <main className="site-shell">
+    <main className={`site-shell ${theme === "light" ? "site-light" : "site-dark"}`}>
       <div className="topline">
         <div className="topline-inner">
           <span><span className="live-dot" /> {content.announcement}</span>
@@ -121,6 +131,10 @@ export default function Home() {
           <a href="#match-info">Match info</a>
           <a href="#faq">Need help?</a>
         </nav>
+        <button className="theme-toggle" type="button" onClick={() => setTheme((current) => current === "dark" ? "light" : "dark")} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}>
+          {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+          <span>{theme === "dark" ? "Light" : "Dark"}</span>
+        </button>
         <button className="header-cta" onClick={() => document.getElementById("tickets")?.scrollIntoView({ behavior: "smooth" })}>
           Get tickets <ArrowRight size={16} />
         </button>
