@@ -6,7 +6,7 @@
   "outputDirectory": "dist/public",
   "rewrites": [
     {
-      "source": "/404",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]

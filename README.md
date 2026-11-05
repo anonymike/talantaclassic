@@ -35,6 +35,21 @@ git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
 git push -u origin main
 ```
 
-Then open Vercel, choose **Add New Project**, import the GitHub repository, and deploy. The repository configuration already sets the install command, build command (`pnpm build:static`), output directory (`dist/public`), and the `/404` SPA rewrite.
+Then open Vercel, choose **Add New Project**, import the GitHub repository, and deploy. The repository configuration already sets the install command, build command (`pnpm build:static`), output directory (`dist/public`), and the SPA rewrite needed for direct visits to both `/` and `/admin`.
 
 The repository now owns the poster at `client/public/match-poster.png`, so the artwork works independently of Manus storage. Live Stripe payment processing, database order persistence, and transactional E-ticket email delivery still require a backend deployment and provider credentials; the current Vercel deployment intentionally keeps the demo payment flow.
+
+## Admin panel and Resend delivery
+
+Open `/admin` to use the MatchPass Control Room. The homepage editor can update the announcement, hero copy, event details, ticket tier labels, ticket prices, availability labels, delivery note, and support email. In this first deployment-ready version, edits persist in the current browser with `localStorage`; connect `SiteContent` to your database when multiple admins need shared publishing.
+
+The Orders & delivery view includes sample order records and controls for sending an E-ticket, a payment receipt, or both. The Vercel function at `api/admin/send-receipt.ts` is prepared for Resend and sends only from the server side. Add these Vercel environment variables before using live delivery:
+
+```text
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=MatchPass <tickets@your-verified-domain.com>
+RESEND_REPLY_TO=hello@your-domain.com
+ADMIN_PANEL_KEY=use-a-long-random-private-value
+```
+
+Resend handles email only. Phone numbers are captured in the order records and delivery UI, but actual SMS requires a separate provider such as Twilio or Africa's Talking. The admin key protects the delivery endpoint; it is never embedded in the public bundle.

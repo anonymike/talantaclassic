@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   Check,
@@ -18,45 +18,17 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { readSiteContent } from "@/lib/siteContent";
 
 const poster = "/match-poster.png";
-
-const tiers = [
-  {
-    id: "grandstand",
-    name: "Grandstand",
-    price: 35,
-    accent: "cool",
-    description: "High-energy views from the main bowl.",
-    benefits: ["Reserved seat", "Stadium atmosphere", "Mobile E-ticket"],
-    availability: "Selling fast",
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    price: 65,
-    accent: "hot",
-    description: "Elevated sightlines, closer to the action.",
-    benefits: ["Premium reserved seat", "Dedicated entry lane", "Mobile E-ticket"],
-    availability: "Best value",
-  },
-  {
-    id: "vip",
-    name: "VIP Lounge",
-    price: 140,
-    accent: "gold",
-    description: "A matchday experience with room to breathe.",
-    benefits: ["Lounge access", "Premium padded seat", "Priority entry"],
-    availability: "Limited release",
-  },
-] as const;
-
-type TierId = (typeof tiers)[number]["id"];
 type CheckoutStep = "details" | "payment" | "success";
 
 const formatKes = (value: number) => `KES ${value.toLocaleString("en-KE")}`;
 
 export default function Home() {
+  const [content, setContent] = useState(() => readSiteContent());
+  const tiers = content.tiers;
+  type TierId = (typeof tiers)[number]["id"];
   const [quantities, setQuantities] = useState<Record<TierId, number>>({
     grandstand: 0,
     premium: 1,
@@ -69,6 +41,12 @@ export default function Home() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", city: "" });
   const [orderRef, setOrderRef] = useState("");
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const syncContent = () => setContent(readSiteContent());
+    window.addEventListener("matchpass-content-updated", syncContent);
+    return () => window.removeEventListener("matchpass-content-updated", syncContent);
+  }, []);
 
   const selectedItems = useMemo(
     () => tiers.filter((tier) => quantities[tier.id] > 0),
@@ -128,7 +106,7 @@ export default function Home() {
     <main className="site-shell">
       <div className="topline">
         <div className="topline-inner">
-          <span><span className="live-dot" /> Tickets are now on sale</span>
+          <span><span className="live-dot" /> {content.announcement}</span>
           <span className="topline-note">5 January 2027 <span className="topline-separator">/</span> Nairobi, Kenya</span>
         </div>
       </div>
@@ -150,9 +128,9 @@ export default function Home() {
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <div className="eyebrow"><span className="eyebrow-line" /> The fixture of the summer</div>
-          <h1>YOUR SEAT<br /><span>TO THE MOMENT.</span></h1>
-          <p className="hero-intro">Bayern Munich meets Ajax under the Nairobi lights. Be in the stands when two football giants share one unforgettable night.</p>
+          <div className="eyebrow"><span className="eyebrow-line" /> {content.heroEyebrow}</div>
+          <h1>{content.heroTitle}<br /><span>{content.heroTitleAccent}</span></h1>
+          <p className="hero-intro">{content.heroIntro}</p>
           <div className="hero-actions">
             <button className="button button-primary" onClick={() => document.getElementById("tickets")?.scrollIntoView({ behavior: "smooth" })}>
               Choose your seats <ArrowRight size={18} />
@@ -160,9 +138,9 @@ export default function Home() {
             <a className="text-link" href="#match-info">Explore the match <ChevronDown size={15} /></a>
           </div>
           <div className="hero-details">
-            <div><span className="detail-label">DATE</span><strong>05 JAN 2027</strong></div>
-            <div><span className="detail-label">KICK-OFF</span><strong>7:00 PM EAT</strong></div>
-            <div><span className="detail-label">VENUE</span><strong>RAILA ODINGA STADIUM</strong></div>
+            <div><span className="detail-label">DATE</span><strong>{content.matchDate}</strong></div>
+            <div><span className="detail-label">KICK-OFF</span><strong>{content.kickOff}</strong></div>
+            <div><span className="detail-label">VENUE</span><strong>{content.venue}</strong></div>
           </div>
         </div>
         <div className="hero-art-wrap">
@@ -176,16 +154,16 @@ export default function Home() {
       </section>
 
       <section className="match-strip" id="match-info">
-        <div className="strip-item"><div className="strip-icon"><MapPin size={18} /></div><div><span>WHERE</span><strong>Talanta Sports City<br />Nairobi, Kenya</strong></div></div>
-        <div className="strip-item"><div className="strip-icon"><Clock3 size={18} /></div><div><span>WHEN</span><strong>Wednesday<br />5 January 2027</strong></div></div>
-        <div className="strip-item"><div className="strip-icon"><Users size={18} /></div><div><span>GOOD TO KNOW</span><strong>Gates open<br />from 4:00 PM EAT</strong></div></div>
+        <div className="strip-item"><div className="strip-icon"><MapPin size={18} /></div><div><span>WHERE</span><strong>{content.location.split(",")[0]}<br />{content.location.split(",").slice(1).join(",").trim()}</strong></div></div>
+        <div className="strip-item"><div className="strip-icon"><Clock3 size={18} /></div><div><span>WHEN</span><strong>Wednesday<br />{content.matchDate}</strong></div></div>
+        <div className="strip-item"><div className="strip-icon"><Users size={18} /></div><div><span>GOOD TO KNOW</span><strong>{content.gates.split(" from ")[0]}<br />{content.gates.split(" from ")[1] ?? "4:00 PM EAT"}</strong></div></div>
         <div className="strip-item trust-item"><div className="strip-icon"><ShieldCheck size={18} /></div><div><span>WHY MATCHPASS</span><strong>Verified tickets.<br />Secure checkout.</strong></div></div>
       </section>
 
       <section className="tickets-section" id="tickets">
         <div className="section-heading">
           <div><div className="eyebrow"><span className="eyebrow-line" /> Pick your view</div><h2>ONE NIGHT.<br /><em>THREE WAYS IN.</em></h2></div>
-          <p>Every ticket is a reserved seat with a mobile E-ticket delivered to your inbox after payment confirmation.</p>
+          <p>{content.ticketIntro}</p>
         </div>
 
         <div className="tickets-layout">
@@ -203,10 +181,10 @@ export default function Home() {
           <aside className="summary-card" aria-label="Your ticket summary">
             <div className="summary-top"><span className="summary-kicker">YOUR MATCHDAY</span><span className="summary-status"><span className="status-dot" /> LIVE</span></div>
             <div className="summary-match"><div className="summary-team"><div className="team-crest bayern">FCB</div><span>BAYERN</span></div><span className="summary-vs">VS</span><div className="summary-team"><div className="team-crest ajax">AFC</div><span>AJAX</span></div></div>
-            <div className="summary-date"><strong>05</strong><span><b>JANUARY 2027</b><small>Raila Odinga Stadium</small></span></div>
+            <div className="summary-date"><strong>{content.matchDate.slice(0, 2)}</strong><span><b>{content.matchDate.slice(3)}</b><small>{content.venue}</small></span></div>
             <div className="summary-lines">{selectedItems.length === 0 ? <div className="empty-summary">Choose a ticket tier to get started.</div> : selectedItems.map((tier) => <div className="summary-line" key={tier.id}><span>{tier.name} × {quantities[tier.id]}</span><strong>{formatKes(tier.price * quantities[tier.id])}</strong></div>)}{ticketCount > 0 && <><div className="summary-line muted"><span>Secure processing fee</span><strong>{formatKes(serviceFee)}</strong></div><div className="summary-total"><span>TOTAL</span><strong>{formatKes(total)}</strong></div></>}</div>
             <button className="button button-summary" disabled={ticketCount === 0} onClick={openCheckout}>{ticketCount === 0 ? "Select tickets" : `Continue · ${ticketCount} ${ticketCount === 1 ? "ticket" : "tickets"}`}<ArrowRight size={17} /></button>
-            <div className="summary-foot"><ShieldCheck size={15} /><span>Your payment is protected. E-tickets are emailed after confirmation.</span></div>
+            <div className="summary-foot"><ShieldCheck size={15} /><span>Your payment is protected. {content.deliveryNote}</span></div>
           </aside>
         </div>
       </section>
